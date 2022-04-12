@@ -6,7 +6,7 @@ URL endpoints:
 
 [GET] ./restmiddleware.php -> GET all todo
 [POST] ./restmiddleware.php -> POST a new TODO
-[PUT] ./restmiddleware.php -> PUT (modify) an existing TODO
+[PUT] ./restmiddleware.php/?id=$id -> PUT (modify - complete) an existing TODO
 [DELETE] ./restmiddleware.php/?id=$id -> DELETE an existing TODO
 */
 
@@ -17,6 +17,7 @@ class RestService {
    private function setHttpHeaders($contentType, $statusCode){
 		http_response_code($statusCode);		
 		header("Content-Type:". $contentType);
+      header("Access-Control-Allow-Origin: *");
 	}
 
    public function encodeJson($responseData) {
@@ -38,8 +39,7 @@ class RestService {
       try {
          $todos = new Todos();
          switch($_SERVER['REQUEST_METHOD']) {
-            case 'GET': {
-               
+            case 'GET': {     
                $result = $todos->getAll();
                $this->setHttpHeaders("application/json", 200);
                $jsonResponse = $this->encodeJson($result);
@@ -48,26 +48,28 @@ class RestService {
             break;
             case 'POST': {
                $data = json_decode(file_get_contents('php://input'), true);
-               if (array_key_exists("title",$data) && array_key_exists("date",$data) && array_key_exists("completed",$data)) {
+               if (array_key_exists("title",$data) && array_key_exists("date",$data)) {
                   $result = $todos->createOne($data);
                   if ($result) {
                      $this->returnOk();
                   } else {
                      $this->returnKO(400);
                   }
+               } else {
+                  $this->returnKO(400);
                }
             }
             break;
             case 'PUT': {
-               $data = json_decode(file_get_contents('php://input'), true);
-               if (array_key_exists("id",$data)) {
-                  $id=$data["id"];
-                  $result = $todos->completeOne($id);
+               if(isset($_GET["id"])) {
+                  $result = $todos->completeOne($_GET["id"]);
                   if ($result) {
                      $this->returnOk();
                   } else {
                      $this->returnKO(400);
                   }
+               } else {
+                  $this->returnKO(400);
                }
             }
             break;
@@ -79,6 +81,8 @@ class RestService {
                   } else {
                      $this->returnKO(400);
                   }
+               } else {
+                  $this->returnKO(400);
                }
             }
             break;
