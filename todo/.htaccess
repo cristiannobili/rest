@@ -3,8 +3,8 @@ Options +FollowSymlinks
 RewriteEngine on
 
 # map neat URL to internal URL
-RewriteRule ^todo/$   restmiddleware.php?view=all [nc,qsa]
-RewriteRule ^todo/([0-9]+)/$   restmiddleware.php?view=single&id=$1 [nc,qsa]
+RewriteRule ^todo/$   restmiddleware.php [nc,qsa]
+RewriteRule ^todo/([0-9]+)/$   restmiddleware.php?id=$1 [nc,qsa]
 
 # nc -> case insensitive
 # qsa -> append query string (if exists)
