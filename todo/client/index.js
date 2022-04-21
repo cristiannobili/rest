@@ -1,28 +1,38 @@
 
 class Presenter {
+   
    constructor() {
-      this.todos = new Todos(() => {
-         document.querySelector("#date").value = new Date().toISOString().split('T')[0];
-         document.querySelector("#send")
-         .addEventListener('click', () => {
-            this.add();
-         });
-         this.refresh();
+      this.init();
+      this.middleware = new Middleware();
+      this.middleware.read(this.refresh);
+   }
+
+   init() {
+      document.querySelector("#date").value = new Date().toISOString().split('T')[0];
+      document.querySelector("#send")
+      .addEventListener('click', () => {
+         this.add();
       });
-      
    }
 
    add() {
-      const title = document.querySelector("#title").value;
+      const todo = {
+         title: document.querySelector("#title").value,
+         date: document.querySelector("#date").value
+      }
       document.querySelector("#title").value = "";
-      const date = document.querySelector("#date").value;
-      this.todos.add(title, date, () => {
-         this.refresh();
-      });
+      this.middleware.create(todo, this.refresh);
    }
 
-   refresh() {
-      
+   remove(index) {
+      this.middleware.delete(index, this.refresh);
+   }
+
+   complete(index) {
+      this.middleware.complete(index, this.refresh);
+   }
+
+   refresh(list) {
       let template = `
          <li class="element">
             <div class="title %COMPLETE">%TITLE</div>
@@ -31,7 +41,7 @@ class Presenter {
          </li>
       `;
       let html = "";
-      this.todos.get().forEach(element => {
+      list.forEach(element => {
          let date = new Date(element.date);
 
          let row = template.replace("%TITLE", date.toLocaleDateString() + ": " + element.title);
@@ -43,19 +53,6 @@ class Presenter {
       });
       document.querySelector('ul').innerHTML = html;
    }
-
-   remove(index) {
-      this.todos.remove(index, () => {
-         this.refresh();
-      });
-   }
-
-   complete(index) {
-      this.todos.complete(index, () => {
-         this.refresh();
-      });
-   }
-
 }
 
 let presenter;

@@ -1,6 +1,5 @@
 class Middleware {
    constructor() {
-      this.count = 0;
       this.url = '/rest/todo/restmiddleware.php';
    }
 
@@ -27,26 +26,24 @@ class Middleware {
    }
 
    read(callback) {
-      this.connect(this.url, 'GET', null, (response) => {
+      let action = (response) => {
          const data = JSON.parse(response);
          callback(data);
-      })
+      };
+      this.connect(this.url, 'GET', null, action);
    }
 
    connect(url, method, body, callback) {
       const xhr = new XMLHttpRequest();
       xhr.open(method, url);
-      xhr.onload = () => {
+      let manageResponse = () => {
          if (xhr.status != 200) { 
             alert(`Error ${xhr.status}: ${xhr.statusText}`); 
           } else { 
             callback(xhr.response);
           }
       }
-      if (body) {
-         xhr.send(body);
-      } else {
-         xhr.send();
-      }  
+      xhr.onload = manageResponse;
+      xhr.send(body);  
    }
 }
