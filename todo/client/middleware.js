@@ -5,7 +5,7 @@ class Middleware {
 
    create(todo, callback) {
       const body = JSON.stringify(todo);
-      this.connect(this.url, 'POST', body, (result) => {
+      this.connect(this.url, 'POST', body, () => {
          this.read(callback);
       })
       callback(); 
@@ -13,14 +13,14 @@ class Middleware {
 
    delete(id, callback) {
       const url = this.url + '?id=' + id;
-      this.connect(url, 'DELETE', null, (result) => {
+      this.connect(url, 'DELETE', null, () => {
          this.read(callback);
       })
    }
 
    complete(id, callback) {
       const url =  this.url + '?id=' + id;
-      this.connect(url, 'PUT', null, (result) => {
+      this.connect(url, 'PUT', null, () => {
          this.read(callback);
       }) 
    }
